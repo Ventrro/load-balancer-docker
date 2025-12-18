@@ -1,178 +1,257 @@
-\# Load Balancing Aplikasi dengan Docker dan Traefik
+Load Balancing Aplikasi dengan Docker dan Traefik
 
+Project ini mengimplementasikan load balancing menggunakan Docker dan Traefik sebagai reverse proxy untuk mendistribusikan traffic ke beberapa backend container.
 
+👥 Authors
 
-Project ini mengimplementasikan load balancing menggunakan Docker dan Traefik.
+Nama: Muhammad Abdillah Martadinata  
+NIM: 062430701451  
+Kelas: 3CD
 
+Nama: Celsya Intan Kinanti  
+NIM: 062430701443  
+Kelas: 3CD  
 
+Nama: Fathir Muhammad Evantra  
+NIM: 062430701445  
+Kelas: 3CD    
 
-\## Authors
 
-\*\*Nama:\*\* Muhammad Abdillah Martadinata 
+📋 Daftar Isi
 
-\*\*NPM:\*\* 062430701451
+- [Deskripsi Project](#deskripsi-project)
+- [Teknologi yang Digunakan](#teknologi-yang-digunakan)
+- [Fitur](#fitur)
+- [Cara Instalasi](#cara-instalasi)
+- [Cara Penggunaan](#cara-penggunaan)
+- [Testing Load Balancer](#testing-load-balancer)
+- [Troubleshooting](#troubleshooting)
+- [Author](#author)
 
-\*\*Kelas:\*\* 3CD
+🎯 Deskripsi Project
 
+Project ini mendemonstrasikan implementasi load balancing dengan menggunakan:
+- **Traefik v2.10** sebagai reverse proxy dan load balancer
+- **3 backend containers** yang menjalankan aplikasi Flask sederhana
+- **Docker Compose** untuk orchestration
 
+Load balancer secara otomatis mendistribusikan incoming requests ke multiple backend containers menggunakan round-robin algorithm.
 
-\*\*Nama:\*\* Celsya Intan Kinanti
+🛠 Teknologi yang Digunakan
 
-\*\*NPM:\*\* 062430701443
+- Docker Desktop (Windows)
+- Traefik v2.10 (Load Balancer)
+- Python** 3.11
+- Flask** (Web Framework)
 
-\*\*Kelas:\*\* 3CD
+✅ Fitur
 
+- ✅ Load balancing otomatis dengan 3 backend containers
+- ✅ Round-robin distribution
+- ✅ Traefik dashboard untuk monitoring
+- ✅ Health checks otomatis
+- ✅ Fault tolerance
 
+🚀 Cara Instalasi
 
-\*\*Nama:\*\* Fathir Muhammad Evantra
+Lihat [INSTALLATION.md] untuk panduan instalasi lengkap.
 
-\*\*NPM:\*\* 06243070144
-
-\*\*Kelas:\*\* 3CD
-
-
-
-
-
-\## Teknologi
-
-\- Docker \& Docker Compose
-
-\- Traefik v2.10 (Load Balancer)
-
-\- Python 3.11 + Flask (Backend)
-
-
-
-\## Arsitektur
-
-```
-
-Internet → Traefik (Port 80, 8080) → Backend1, Backend2, Backend3
-
-```
-
-
-
-\## Cara Menjalankan
-
-
-
-\### Prerequisites
-
-\- Docker Desktop terinstall
-
-\- Port 80 dan 8080 tersedia
-
-
-
-\### Instalasi
-
-```bash
-
-\# Clone repository
-
-git clone https://github.com/username/load-balancer-docker.git
-
-cd load-balancer-docker
-
-
-
-\# Build dan start
-
-docker compose up --build -d
-
-
-
-\# Check status
-
-docker compose ps
-
-```
-
-
-
-\### Testing
-
-\- Backend: http://localhost
-
-\- Dashboard: http://localhost:8080
-
-
-
-\### Stop
-
-```bash
-
-docker compose down
-
-```
-
-
-
-\## ✅ Fitur
-
-✅ 3 Backend containers  
-
-✅ Load balancing (round-robin)  
-
-✅ Service discovery otomatis  
-
-✅ Health checks  
-
-✅ Traefik dashboard  
-
-
-
-\## 📊 Testing Load Balancer
-
-
-
-Request beberapa kali dan lihat hostname berubah:
+Quick Start
 
 ```powershell
+# 1. Navigate ke project directory
+cd load-balancer-docker
 
-for ($i=1; $i -le 10; $i++) {
+# 2. Build dan start containers
+docker compose build
+docker compose up -d
 
-&nbsp;   curl http://localhost
+# 3. Test
+curl http://localhost
 
+📖 Cara Penggunaan
+
+Mengakses Aplikasi
+
+Backend Application:
+- URL: `http://localhost`
+- Response: JSON dengan informasi container
+
+Traefik Dashboard:
+- URL: `http://localhost:8080`
+- Dashboard untuk monitoring status services
+
+API Endpoints
+
+GET /
+Endpoint utama yang menampilkan informasi container.
+
+Request:
+```powershell
+curl http://localhost
+```
+
+Response:
+```json
+{
+  "message": "Hello from backend!",
+  "hostname": "backend1",
+  "container_id": "a1b2c3d4e5f6",
+  "status": "running"
 }
-
 ```
 
+GET /health
+Health check endpoint.
 
+Request:
+```powershell
+curl http://localhost/health
+```
 
-\## Troubleshooting
+Response:
+```json
+{
+  "status": "healthy"
+}
+```
 
+🧪 Testing Load Balancer
 
+Test 1: Multiple Requests
 
-\*\*Port 80 sudah digunakan:\*\*
+Jalankan request beberapa kali untuk melihat load balancing bekerja:
 
-```bash
+```powershell
+for ($i=1; $i -le 10; $i++) {
+    curl http://localhost
+    Write-Host ""
+}
+```
 
-\# Ganti port di docker-compose.yml
+Expected Result:  
+Anda akan melihat `hostname` berubah-ubah antara backend1, backend2, dan backend3.
 
+Test 2: Load Balancing dengan Hostname
+
+```powershell
+for ($i=1; $i -le 10; $i++) {
+    $result = curl http://localhost | ConvertFrom-Json
+    Write-Host "Request $i -> $($result.hostname)"
+}
+```
+
+Test 3: Container Failure Simulation
+
+Test bagaimana load balancer menangani failure:
+
+```powershell
+Stop satu backend
+docker compose stop backend1
+
+Test masih bisa akses
+curl http://localhost
+
+Start kembali
+docker compose start backend1
+```
+
+🔧 Commands
+
+Basic Commands
+
+```powershell
+# Start services
+docker compose up -d
+
+# Stop services
+docker compose down
+
+# Check status
+docker compose ps
+
+# View logs
+docker compose logs -f
+
+# Restart service
+docker compose restart backend1
+```
+
+❗ Troubleshooting
+
+Issue 1: Port 80 Already in Use
+
+Solusi:
+```powershell
+# Check process using port 80
+netstat -ano | findstr :80
+
+# Kill process (ganti <PID> dengan nomor PID)
+taskkill /PID <PID> /F
+```
+
+Atau ganti port di `docker-compose.yml`:
+```yaml
 ports:
-
-&nbsp; - "8000:80"
-
+  - "8000:80"  # Ganti 80 ke 8000
 ```
 
+### Issue 2: Container Tidak Start
 
+Solusi:
+```powershell
+# Check logs
+docker compose logs
 
-\*\*Container tidak start:\*\*
-
-```bash
-
-docker compose logs traefik
-
-docker compose logs backend1
-
+# Rebuild
+docker compose build --no-cache
+docker compose up -d
 ```
 
+Issue 3: 404 Not Found
 
+Solusi:
+```powershell
+# Verify containers running
+docker compose ps
 
-\## Repository
+# Check Traefik dashboard
+# Buka http://localhost:8080
 
-https://github.com/Ventrro/load-balancer-docker
+# Restart Traefik
+docker compose restart traefik
+```
 
+Issue 4: Traefik Connection Error
+
+Gejala:
+```
+Provider connection error
+```
+
+Solusi:
+1. Buka Docker Desktop → Settings → General
+2. Centang: "Expose daemon on tcp://localhost:2375 without TLS"
+3. Apply & Restart
+4. Restart containers: `docker compose restart`
+
+📝 Struktur Project
+
+```
+load-balancer-docker/
+├── README.md
+├── INSTALLATION.md
+├── docker-compose.yml
+├── .gitignore
+└── backend/
+    ├── Dockerfile
+    └── app.py
+```
+
+📄 License
+
+Project ini dibuat untuk keperluan project.
+
+---
+
+Repository: https://github.com/Ventrro/load-balancer-docker  
